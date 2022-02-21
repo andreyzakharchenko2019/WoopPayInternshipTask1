@@ -4,7 +4,7 @@
     <string name="title_fragment2">Текст</string>
     <string name="title_editText">Напишите что-нибудь</string>
     <string name="title_button">Любоваться котиком</string>
-    <string name="error_empty_text">Введите текст</string>
+    <string name="error_empty_text">Недостаточно символов</string>
     <string name="get_fact_cat">Узнать факт о кошках</string>
     <string name="original">Оригинальный текст:</string>
     <string name="search_fact">Ищем интересный факт …</string>

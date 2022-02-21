@@ -11,29 +11,15 @@ import java.io.InputStream;
 public class ImageModel {
 
     private Bitmap bitmap;
-    private String textInImage;
 
     public Bitmap getImage(String textInImage) {
-        this.textInImage = textInImage;
-        GetImage getImage = new GetImage();
-        getImage.start();
+        InputStream inputStream = null;
         try {
-            getImage.join();
-        } catch (InterruptedException e) {
+            inputStream = new java.net.URL(URL_IMAGE + textInImage).openStream();
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        bitmap = BitmapFactory.decodeStream(inputStream);
         return bitmap;
-    }
-
-    private class GetImage extends Thread {
-        @Override
-        public void run() {
-            try {
-                InputStream inputStream = new java.net.URL(URL_IMAGE + textInImage).openStream();
-                bitmap = BitmapFactory.decodeStream(inputStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

@@ -1,5 +1,6 @@
 package com.andreyzakharchenko.wooppayinternshiptask1.ui.image;
 
+import static com.andreyzakharchenko.wooppayinternshiptask1.R.drawable.ic_baseline_sync_24;
 import static com.andreyzakharchenko.wooppayinternshiptask1.R.drawable.ic_image_image_24;
 
 import android.graphics.Bitmap;
@@ -46,7 +47,7 @@ public class ImageFragment extends Fragment implements com.andreyzakharchenko.wo
             if (editText.getText().toString().trim().equals("")) {
                 Toast.makeText(getActivity(), R.string.error_empty_text, Toast.LENGTH_LONG).show();
             } else {
-                imageView.setImageResource(ic_image_image_24);
+                imageView.setImageResource(ic_baseline_sync_24);
                 getImage(editText.getText().toString());
             }
         });
@@ -62,12 +63,23 @@ public class ImageFragment extends Fragment implements com.andreyzakharchenko.wo
 
     @Override
     public void getImage(String textInImage){
-        imagePresenter.getImage(textInImage);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                imagePresenter.getImage(textInImage);
+            }
+        });
+        thread.start();
     }
 
     @Override
     public void showImage(Bitmap bitmap) {
-        imageView.setImageBitmap(bitmap);
+        imageView.post(new Runnable() {
+            @Override
+            public void run() {
+                imageView.setImageBitmap(bitmap);
+            }
+        });
     }
 
 }
