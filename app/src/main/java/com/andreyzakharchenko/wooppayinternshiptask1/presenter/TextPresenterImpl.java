@@ -19,7 +19,6 @@ public class TextPresenterImpl implements TextPresenter{
 
     @Override
     public void getFactAboutCats() {
-        textView.searchingFact();
         textView.showFactAboutCats(textModel.getFactAboutCats());
     }
 

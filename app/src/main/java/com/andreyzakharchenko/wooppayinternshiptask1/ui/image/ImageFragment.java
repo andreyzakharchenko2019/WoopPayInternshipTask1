@@ -1,10 +1,9 @@
 package com.andreyzakharchenko.wooppayinternshiptask1.ui.image;
 
+import static com.andreyzakharchenko.wooppayinternshiptask1.R.drawable.ic_image_image_24;
+
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +14,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.andreyzakharchenko.wooppayinternshiptask1.R;
 import com.andreyzakharchenko.wooppayinternshiptask1.databinding.FragmentImageBinding;
 import com.andreyzakharchenko.wooppayinternshiptask1.model.ImageModel;
-import com.andreyzakharchenko.wooppayinternshiptask1.model.TextModel;
 import com.andreyzakharchenko.wooppayinternshiptask1.presenter.ImagePresenterImpl;
-import com.andreyzakharchenko.wooppayinternshiptask1.presenter.TextPresenterImpl;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 
 public class ImageFragment extends Fragment implements com.andreyzakharchenko.wooppayinternshiptask1.ui.image.ImageView {
 
@@ -54,6 +46,7 @@ public class ImageFragment extends Fragment implements com.andreyzakharchenko.wo
             if (editText.getText().toString().trim().equals("")) {
                 Toast.makeText(getActivity(), R.string.error_empty_text, Toast.LENGTH_LONG).show();
             } else {
+                imageView.setImageResource(ic_image_image_24);
                 getImage(editText.getText().toString());
             }
         });

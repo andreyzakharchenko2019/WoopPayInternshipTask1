@@ -1,6 +1,8 @@
 package com.andreyzakharchenko.wooppayinternshiptask1.ui.text;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.andreyzakharchenko.wooppayinternshiptask1.R;
 import com.andreyzakharchenko.wooppayinternshiptask1.databinding.FragmentTextBinding;
@@ -26,6 +27,8 @@ public class TextFragment extends Fragment implements com.andreyzakharchenko.woo
     private TextView textFactView;
     private TextView textTranslateView;
 
+    private Handler handler = new Handler(Looper.getMainLooper());
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -41,9 +44,8 @@ public class TextFragment extends Fragment implements com.andreyzakharchenko.woo
         textPresenter.attachView(this);
 
         button.setOnClickListener(view -> {
+            textFactView.setText(R.string.search_fact);
             getFactAboutCats();
-            getTranslateFact();
-            //new GetFact().start();
         });
 
         return root;
@@ -57,26 +59,41 @@ public class TextFragment extends Fragment implements com.andreyzakharchenko.woo
 
     @Override
     public void getFactAboutCats() {
-        textPresenter.getFactAboutCats();
+        Thread thread = new Thread(() -> textPresenter.getFactAboutCats());
+        thread.start();
     }
 
     @Override
     public void showFactAboutCats(String fact) {
-        textFactView.setText(fact);
-    }
-
-    @Override
-    public void searchingFact() {
-        textFactView.setText(R.string.search_fact);
+        textFactView.post(() -> textFactView.setText(fact));
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                getTranslateFact();
+            }
+        });
     }
 
     @Override
     public void getTranslateFact() {
-        textPresenter.getTranslateFact(textFactView.getText().toString());
+        textTranslateView.setText(R.string.search_translate);
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                textPresenter.getTranslateFact(textFactView.getText().toString());
+            }
+        });
+        thread.start();
     }
 
     @Override
     public void showTranslateFact(String translateFact) {
-        textTranslateView.setText(translateFact);
+        textTranslateView.post(new Runnable() {
+            @Override
+            public void run() {
+                textTranslateView.setText(translateFact);
+            }
+        });
     }
 }
