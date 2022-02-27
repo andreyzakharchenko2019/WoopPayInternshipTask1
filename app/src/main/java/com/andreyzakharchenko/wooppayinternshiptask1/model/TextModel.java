@@ -5,6 +5,8 @@ import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.NAME_FIELD
 import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.URL_API_TRANSLATE;
 import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.URL_FACT;
 
+import com.andreyzakharchenko.wooppayinternshiptask1.util.OkHttpSingleton;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,6 +16,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -24,35 +28,15 @@ public class TextModel {
     private String translateFact;
 
     public String getFactAboutCats() {
-        HttpURLConnection httpURLConnection = null;
-        BufferedReader bufferedReader = null;
-
+        OkHttpClient client = OkHttpSingleton.getInstance();
+        Request request = new Request.Builder()
+                .url(URL_FACT)
+                .build();
         try {
-            URL url = new URL(URL_FACT);
-            httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.connect();
-            InputStream inputStream = httpURLConnection.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuffer stringBuffer = new StringBuffer();
-
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuffer.append(line);
-            }
-            parsingFactFromJSON(stringBuffer.toString());
+            Response response = client.newCall(request).execute();
+            parsingFactFromJSON(response.body().string());
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (httpURLConnection != null) {
-                httpURLConnection.disconnect();
-            }
-            try {
-                if (bufferedReader != null) {
-                    bufferedReader.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return fact;
     }
@@ -68,7 +52,7 @@ public class TextModel {
 
     public String getTranslateFact(String fact) {
         this.fact = fact;
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = OkHttpSingleton.getInstance();
         Request request = new Request.Builder()
                 .url(URL_API_TRANSLATE + fact)
                 // .post(body)
