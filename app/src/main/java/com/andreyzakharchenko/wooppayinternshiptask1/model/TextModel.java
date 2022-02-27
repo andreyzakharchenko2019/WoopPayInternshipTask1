@@ -1,83 +1,86 @@
 package com.andreyzakharchenko.wooppayinternshiptask1.model;
 
-import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.NAME_FIELD_JSON_FACT;
-import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.NAME_FIELD_JSON_FACT_TRANSLATE;
-import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.URL_API_TRANSLATE;
-import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.URL_FACT;
+import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.*;
+
+import androidx.annotation.NonNull;
 
 import com.andreyzakharchenko.wooppayinternshiptask1.util.OkHttpSingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
-import okhttp3.OkHttp;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class TextModel {
+public class TextModel implements ContractTextModel {
 
-    private String fact;
-    private String translateFact;
-
-    public String getFactAboutCats() {
+    @Override
+    public void getFactAboutCats(OnFinishedListenerFact onFinishedListenerFact) {
         OkHttpClient client = OkHttpSingleton.getInstance();
         Request request = new Request.Builder()
                 .url(URL_FACT)
                 .build();
-        try {
-            Response response = client.newCall(request).execute();
-            parsingFactFromJSON(response.body().string());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return fact;
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                onFinishedListenerFact.onFinishedFact(parsingFactFromJSON(response.body().string()));
+            }
+        });
     }
 
-    private void parsingFactFromJSON(String factCatJSON) {
+    private String parsingFactFromJSON(String factCatJSON) {
         try {
             JSONObject jsonObject = new JSONObject(factCatJSON);
-            fact = jsonObject.getString(NAME_FIELD_JSON_FACT);
+            return jsonObject.getString(NAME_FIELD_JSON_FACT);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return ERROR_GET_FACT;
     }
 
-    public String getTranslateFact(String fact) {
-        this.fact = fact;
+    @Override
+    public void getTranslateFact(OnFinishedListenerTranslate onFinishedListenerTranslate, String fact) {
         OkHttpClient client = OkHttpSingleton.getInstance();
         Request request = new Request.Builder()
                 .url(URL_API_TRANSLATE + fact)
-                // .post(body)
                 .addHeader("x-rapidapi-key", "a5e68975c7mshb36f57ca47ccf9bp1da4c3jsnbcdd60f9246b")
                 .addHeader("x-rapidapi-host", "just-translated.p.rapidapi.com")
                 .build();
 
-        try {
-            Response response = client.newCall(request).execute();
-            parsingFactTranslateFromJSON(response.body().string());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return translateFact;
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                onFinishedListenerTranslate.onFinishedTranslate(parsingFactTranslateFromJSON(response.body().string()));
+            }
+        });
     }
 
-    private void parsingFactTranslateFromJSON(String factTranslateJSON) {
+    private String parsingFactTranslateFromJSON(String factTranslateJSON) {
         try {
             JSONObject jsonObject = new JSONObject(factTranslateJSON);
             String string = jsonObject.getString(NAME_FIELD_JSON_FACT_TRANSLATE);
             string = string.replace("[\"", "");
             string = string.replace("\"]", "");
-            translateFact = string;
+            return string;
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return ERROR_TRANSLATE_FACT;
     }
 }

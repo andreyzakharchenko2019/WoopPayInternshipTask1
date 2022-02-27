@@ -14,18 +14,19 @@ import androidx.fragment.app.Fragment;
 
 import com.andreyzakharchenko.wooppayinternshiptask1.R;
 import com.andreyzakharchenko.wooppayinternshiptask1.databinding.FragmentTextBinding;
+import com.andreyzakharchenko.wooppayinternshiptask1.model.ContractTextModel;
 import com.andreyzakharchenko.wooppayinternshiptask1.model.TextModel;
-import com.andreyzakharchenko.wooppayinternshiptask1.presenter.TextPresenter;
+import com.andreyzakharchenko.wooppayinternshiptask1.presenter.ContractTextPresenter;
 import com.andreyzakharchenko.wooppayinternshiptask1.presenter.TextPresenterImpl;
 
-public class TextFragment extends Fragment implements com.andreyzakharchenko.wooppayinternshiptask1.ui.text.TextView {
+public class TextFragment extends Fragment implements ContractTextView {
 
     private FragmentTextBinding binding;
 
-    private TextPresenter textPresenter;
+    private ContractTextPresenter textPresenter;
 
-    private TextView textFactView;
-    private TextView textTranslateView;
+    private TextView textViewFact;
+    private TextView textViewTranslate;
 
     private Handler handler = new Handler(Looper.getMainLooper());
 
@@ -36,15 +37,15 @@ public class TextFragment extends Fragment implements com.andreyzakharchenko.woo
         View root = binding.getRoot();
 
         final Button button = binding.factButton;
-        textFactView = binding.factCatText;
-        textTranslateView = binding.translateFactCatText;
+        textViewFact = binding.factCatText;
+        textViewTranslate = binding.translateFactCatText;
 
-        TextModel textModel = new TextModel();
+        ContractTextModel textModel = new TextModel();
         textPresenter = new TextPresenterImpl(textModel);
         textPresenter.attachView(this);
 
         button.setOnClickListener(view -> {
-            textFactView.setText(R.string.search_fact);
+            textViewFact.setText(R.string.search_fact);
             getFactAboutCats();
         });
 
@@ -59,41 +60,21 @@ public class TextFragment extends Fragment implements com.andreyzakharchenko.woo
 
     @Override
     public void getFactAboutCats() {
-        Thread thread = new Thread(() -> textPresenter.getFactAboutCats());
-        thread.start();
+        textPresenter.getFactAboutCats();
     }
 
     @Override
     public void showFactAboutCats(String fact) {
-        textFactView.post(() -> textFactView.setText(fact));
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                getTranslateFact();
-            }
-        });
+        textViewFact.post(() -> textViewFact.setText(fact));
     }
 
     @Override
-    public void getTranslateFact() {
-        textTranslateView.setText(R.string.search_translate);
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                textPresenter.getTranslateFact(textFactView.getText().toString());
-            }
-        });
-        thread.start();
+    public void translatingFact() {
+        textViewTranslate.post(() -> textViewTranslate.setText(R.string.search_translate));
     }
 
     @Override
     public void showTranslateFact(String translateFact) {
-        textTranslateView.post(new Runnable() {
-            @Override
-            public void run() {
-                textTranslateView.setText(translateFact);
-            }
-        });
+        textViewTranslate.post(() -> textViewTranslate.setText(translateFact));
     }
 }
