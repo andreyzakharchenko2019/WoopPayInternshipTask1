@@ -21,7 +21,8 @@ public class TextModel implements ContractTextModel {
 
     @Override
     public void getFactAboutCats(OnFinishedListenerFact onFinishedListenerFact) {
-        OkHttpClient client = OkHttpSingleton.getInstance();
+        OkHttpSingleton okHttpSingleton = OkHttpSingleton.getInstance();
+        OkHttpClient client = okHttpSingleton.getClient();
         Request request = new Request.Builder()
                 .url(URL_FACT)
                 .build();
@@ -51,7 +52,8 @@ public class TextModel implements ContractTextModel {
 
     @Override
     public void getTranslateFact(OnFinishedListenerTranslate onFinishedListenerTranslate, String fact) {
-        OkHttpClient client = OkHttpSingleton.getInstance();
+        OkHttpSingleton okHttpSingleton = OkHttpSingleton.getInstance();
+        OkHttpClient client = okHttpSingleton.getClient();
         Request request = new Request.Builder()
                 .url(URL_API_TRANSLATE + fact)
                 .addHeader("x-rapidapi-key", "a5e68975c7mshb36f57ca47ccf9bp1da4c3jsnbcdd60f9246b")
