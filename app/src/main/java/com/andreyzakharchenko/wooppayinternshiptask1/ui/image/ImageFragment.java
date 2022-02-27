@@ -1,9 +1,7 @@
 package com.andreyzakharchenko.wooppayinternshiptask1.ui.image;
 
-import static com.andreyzakharchenko.wooppayinternshiptask1.R.drawable.ic_baseline_sync_24;
-import static com.andreyzakharchenko.wooppayinternshiptask1.R.drawable.ic_image_image_24;
+import static com.andreyzakharchenko.wooppayinternshiptask1.Constants.*;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +18,13 @@ import com.andreyzakharchenko.wooppayinternshiptask1.R;
 import com.andreyzakharchenko.wooppayinternshiptask1.databinding.FragmentImageBinding;
 import com.andreyzakharchenko.wooppayinternshiptask1.model.ImageModel;
 import com.andreyzakharchenko.wooppayinternshiptask1.presenter.ImagePresenterImpl;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-public class ImageFragment extends Fragment implements com.andreyzakharchenko.wooppayinternshiptask1.ui.image.ImageView {
+public class ImageFragment extends Fragment implements ContractImageView {
 
     private FragmentImageBinding binding;
-
     private ImageView imageView;
-
     private ImagePresenterImpl imagePresenter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -44,12 +42,7 @@ public class ImageFragment extends Fragment implements com.andreyzakharchenko.wo
         imagePresenter.attachView(this);
 
         button.setOnClickListener(view -> {
-            if (editText.getText().toString().trim().equals("")) {
-                Toast.makeText(getActivity(), R.string.error_empty_text, Toast.LENGTH_LONG).show();
-            } else {
-                imageView.setImageResource(ic_baseline_sync_24);
-                getImage(editText.getText().toString());
-            }
+            getImage(editText.getText().toString());
         });
 
         return root;
@@ -62,24 +55,23 @@ public class ImageFragment extends Fragment implements com.andreyzakharchenko.wo
     }
 
     @Override
-    public void getImage(String textInImage){
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                imagePresenter.getImage(textInImage);
-            }
-        });
-        thread.start();
+    public void getImage(String textInImage) {
+        imagePresenter.getImage(textInImage);
     }
 
     @Override
-    public void showImage(Bitmap bitmap) {
-        imageView.post(new Runnable() {
-            @Override
-            public void run() {
-                imageView.setImageBitmap(bitmap);
-            }
-        });
+    public void showNotEnoughCharacters() {
+        Toast.makeText(getActivity(), R.string.error_empty_text, Toast.LENGTH_LONG).show();
     }
 
+
+    @Override
+    public void showImage(String textInImage) {
+        Glide.with(getActivity())
+                .load(URL_IMAGE + textInImage)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(R.drawable.ic_baseline_sync_24)
+                .into(imageView);
+    }
 }
